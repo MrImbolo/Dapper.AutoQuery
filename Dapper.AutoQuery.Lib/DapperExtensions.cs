@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using System.Numerics;
 
 namespace Dapper.AutoQuery.Lib;
@@ -13,7 +14,7 @@ public static class DapperExtensions
         where TKey : INumber<TKey>
     {
         var item = await db.QueryFirstOrDefaultAsync<T>(
-            SqlQueryGenerator.SelectOneById<T, TKey>(), 
+            AutoQuery.SelectOneById<T, TKey>(), 
             new { Id = id }, 
             transaction);
 
@@ -26,8 +27,35 @@ public static class DapperExtensions
         where T : class
     {
         var items = await db.QueryAsync<T>(
-            SqlQueryGenerator.SelectByIdList<T, TKey>(), 
+            AutoQuery.SelectByIdList<T, TKey>(), 
             new { Ids = ids }, 
+            transaction);
+
+        return items;
+    }
+    
+    public static async Task<IEnumerable<T>> SelectAsync<T, TSelectArgs>(
+        this IDbConnection db,
+        IDbTransaction? transaction = null)
+        where T : class
+    {
+        var items = await db.QueryAsync<T>(
+            AutoQuery.Select<T, TSelectArgs>(), 
+            transaction);
+
+        return items;
+    }
+
+    public static async Task<IEnumerable<T>> SelectAsync<T, TSelectArgs>(
+        this IDbConnection db,
+        Expression<Func<T, TSelectArgs, bool>> selector,
+        TSelectArgs args,
+        IDbTransaction? transaction = null)
+        where T : class
+    {
+        var items = await db.QueryAsync<T>(
+            AutoQuery.Select(selector), 
+            args, 
             transaction);
 
         return items;
@@ -40,7 +68,7 @@ public static class DapperExtensions
         where T : class
     {
         await db.ExecuteAsync(
-            SqlQueryGenerator.DeleteByIdList<T>(), 
+            AutoQuery.DeleteByIdList<T>(), 
             new { Ids = ids }, 
             transaction);
     }
@@ -52,7 +80,7 @@ public static class DapperExtensions
         where T : class
     {
         await db.ExecuteAsync(
-            SqlQueryGenerator.DeleteSingle<T>(), 
+            AutoQuery.DeleteSingle<T>(), 
             item, 
             transaction);
     }
@@ -64,7 +92,7 @@ public static class DapperExtensions
         where T : class
     {
         await db.ExecuteAsync(
-            SqlQueryGenerator.Update<T>(),
+            AutoQuery.Update<T>(),
             items, 
             transaction);
     }
@@ -81,20 +109,24 @@ public static class DapperExtensions
         db.Open();
         transaction ??= db.BeginTransaction();
 
-        var tempTableName = "temp_" + Guid.NewGuid().ToString("N");
-        var tempTableCreateQuery = SqlQueryGenerator.CreateIdTempTable(tempTableName, "INT");
+        var tempTableName = "##temp_" + Guid.NewGuid().ToString("N")[..8];
+        var tempTableQuery = AutoQuery.CreateIdTempTable(tempTableName, "INT");
 
-        await db.ExecuteAsync(tempTableCreateQuery, transaction: transaction);
+        await db.ExecuteAsync(tempTableQuery, transaction: transaction);
 
         foreach (var chunk in items.Chunk(500))
         {
             await db.ExecuteAsync(
-                SqlQueryGenerator.InsertBatch<T>(tempTableName),
+                AutoQuery.InsertBatch<T>(tempTableName),
                 chunk, 
                 transaction);
         }
 
-        var ids = await db.QueryAsync<TKey>($"SELECT * FROM {tempTableName}", transaction: transaction);
+        tempTableQuery = AutoQuery.GetIdsAndDropIdTempTable(tempTableName);
+        
+        var ids = await db.QueryAsync<TKey>(
+            tempTableQuery, 
+            transaction: transaction);
 
         foreach (var (item, id) in items.Zip(ids))
         {

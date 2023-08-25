@@ -62,6 +62,8 @@ namespace Dapper.AutoQuery.Lib
         IEntityManagerConfigurationBuilder SetTableAttributeType(Type tableAttributeType);
         IEntityManagerConfigurationBuilder SetLayoutPolicy(FieldLayoutPolicy fieldLayoutPolicy);
 
+        IEntityManagerConfigurationBuilder SetUpLogAction(Action<string> actions);
+
         DAQConfiguration SetGlobally();
     }
 
@@ -128,9 +130,15 @@ namespace Dapper.AutoQuery.Lib
 
         public DAQConfiguration SetGlobally()
         {
+            AutoQuery.SetUpCustomColumnAttributeSupport();
             return this;
         }
 
+        public IEntityManagerConfigurationBuilder SetUpLogAction(Action<string> actions)
+        {
+            AutoQuery.SetUpLogAction(actions);
+            return this;
+        }
     }
 
     public static class Convensions
@@ -217,7 +225,7 @@ namespace Dapper.AutoQuery.Lib
             KeyEquality = $"{KeyField} = {KeyArg}";
         }
 
-        private string Separator => Config.FieldLayoutPolicy.Separator;
+        private string Separator => Config.FieldLayoutPolicy.ToString();
 
         public Dictionary<string, DAQToken> All { get; private set; }
 

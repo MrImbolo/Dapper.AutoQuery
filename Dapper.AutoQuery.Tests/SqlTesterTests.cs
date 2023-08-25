@@ -1,14 +1,7 @@
-﻿using Xunit;
-using Dapper.AutoQuery.Lib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
-using Dapper.AutoQuery.TestModels;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Dapper.AutoQuery.TestModels;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Xunit.Abstractions;
 
 namespace Dapper.AutoQuery.Lib.Tests
 {
@@ -28,58 +21,13 @@ namespace Dapper.AutoQuery.Lib.Tests
                 .SetColumnAttributeType(typeof(ColumnAttribute))
                 .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
                 .SetVarPrefix("@")
+                .SetUpLogAction(Console.WriteLine)
                 .SetGlobally();
         }
+                 
 
         [Fact()]
-        public void BuildInsertTest()
-        {
-            var sql = $"""
-                INSERT INTO TestModels 
-                (
-                    Name
-                    ,CustomName 
-                )
-                VALUES
-                (
-                    @Name
-                    ,@FieldWithCustomName 
-                )
-                """;
-            Assert.Equal(sql, SqlQueryGenerator.Insert<TestModel>());
-        }
-
-        [Fact()]
-        public void BuildSelectTest()
-        {
-            var sql = """
-                SELECT 
-                    Id
-                    ,Name
-                    ,CustomName 
-                FROM TestModels 
-                """;
-
-            Assert.Equal(sql, SqlQueryGenerator.Select<TestModel>());
-        }
-
-        [Fact()]
-        public void BuildUpdateTest()
-        {
-            var sql = """
-                UPDATE TestModels 
-                SET
-                    Name = @Name
-                    ,CustomName = @FieldWithCustomName 
-                WHERE
-                    Id = @Id 
-                """;
-
-            Assert.Equal(sql, SqlQueryGenerator.Update<TestModel>());
-        }
-
-        [Fact()]
-        public void BuildDeleteTest()
+        public void DeleteByIdListTest()
         {
             var sql = """
                 DELETE FROM TestModels 
@@ -87,55 +35,115 @@ namespace Dapper.AutoQuery.Lib.Tests
                     Id IN @Ids 
                 """;
 
-            Assert.Equal(sql, SqlQueryGenerator.DeleteByIdList<TestModel>());
-        }
-
-        [Fact()]
-        public void DeleteByIdListTest()
-        {
-            Assert.True(false, "This test needs an implementation");
+            Assert.Equal(sql, AutoQuery.DeleteByIdList<TestModel>());
         }
 
         [Fact()]
         public void DeleteSingleTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = """
+                DELETE FROM TestModels 
+                WHERE 
+                    Id = @Id 
+                """;
+
+            Assert.Equal(sql, AutoQuery.DeleteSingle<TestModel>());
         }
 
         [Fact()]
         public void CreateIdTempTableTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var tempTableName = "##temp_1";
+            var sql = $"""
+                CREATE TABLE {tempTableName}(Id INT)
+                """;
+
+            Assert.Equal(sql, AutoQuery.CreateIdTempTable(tempTableName, "INT"));
         }
 
         [Fact()]
         public void InsertTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = $"""
+                INSERT INTO TestModels 
+                (
+                    Name
+                    ,Created
+                    ,CustomName 
+                )
+                VALUES
+                (
+                    @Name
+                    ,@Created
+                    ,@FieldWithCustomName 
+                )
+                """;
+            Assert.Equal(sql, AutoQuery.Insert<TestModel>());
         }
 
         [Fact()]
         public void SelectTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = """
+                SELECT 
+                    Id
+                    ,Name
+                    ,Created
+                    ,CustomName 
+                FROM TestModels 
+                """;
+
+            Assert.Equal(sql, AutoQuery.Select<TestModel>());
         }
 
         [Fact()]
         public void SelectOneByIdTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = """
+                SELECT 
+                    Id
+                    ,Name
+                    ,Created
+                    ,CustomName 
+                FROM TestModels 
+                WHERE 
+                    Id = @Id
+                """;
+
+            Assert.Equal(sql, AutoQuery.SelectOneById<TestModel, int>());
         }
 
         [Fact()]
         public void UpdateTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = """
+                UPDATE TestModels 
+                SET
+                    Name = @Name
+                    ,Created = @Created
+                    ,CustomName = @FieldWithCustomName 
+                WHERE
+                    Id = @Id 
+                """;
+
+            Assert.Equal(sql, AutoQuery.Update<TestModel>());
         }
 
         [Fact()]
         public void SelectByIdListTest()
         {
-            Assert.True(false, "This test needs an implementation");
+            var sql = """
+                SELECT 
+                    Id
+                    ,Name
+                    ,Created
+                    ,CustomName 
+                FROM TestModels 
+                WHERE 
+                    Id IN @Ids
+                """;
+
+            Assert.Equal(sql, AutoQuery.SelectByIdList<TestModel, int>());
         }
     }
 }
