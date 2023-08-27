@@ -64,7 +64,7 @@ namespace Dapper.AutoQuery.Lib
 
         IEntityManagerConfigurationBuilder SetUpLogAction(Action<string> actions);
 
-        DAQConfiguration SetGlobally();
+        DAQConfiguration Build();
     }
 
     public static class DAQDefaults
@@ -75,7 +75,6 @@ namespace Dapper.AutoQuery.Lib
         }
         public static DAQConfiguration Configuration { get; private set; } 
         public static IEntityManagerConfigurationBuilder CreateBuilder() => Configuration;
-
     }
     public class DAQConfiguration : IEntityManagerConfigurationBuilder
     {
@@ -128,8 +127,9 @@ namespace Dapper.AutoQuery.Lib
             return this;
         }
 
-        public DAQConfiguration SetGlobally()
+        public DAQConfiguration Build()
         {
+            //typeof(EntityManager<>);
             AutoQuery.SetUpCustomColumnAttributeSupport();
             return this;
         }
@@ -148,6 +148,7 @@ namespace Dapper.AutoQuery.Lib
 
     public static class EntityManager
     {
+        public static void WarmUp<T>() where T : class => EntityManager<T>.GetInstance();
         public static EntityManager<T> GetInstance<T>() 
             where T : class
         {

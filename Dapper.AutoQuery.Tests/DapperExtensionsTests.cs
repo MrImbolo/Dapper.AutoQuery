@@ -2,10 +2,13 @@
 using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Dapper.AutoQuery.Lib.Tests
 {
+    
     public class DapperExtensionsTests
     {
         private SqlConnection _db;
@@ -23,7 +26,9 @@ namespace Dapper.AutoQuery.Lib.Tests
                 .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
                 .SetVarPrefix("@")
                 .SetUpLogAction(testOutput.WriteLine)
-                .SetGlobally();
+                .Build();
+
+            EntityManager.WarmUp<Product>();
         }
         [Fact()]
         public async Task DapperExtensions_SelectByIdAsync_OkAsync()
@@ -33,14 +38,24 @@ namespace Dapper.AutoQuery.Lib.Tests
         }
 
         [Fact()]
-        public async void DapperExtensions_SelectByIdListAsync_Ok()
+        public async Task DapperExtensions_SelectByIdListAsync_Ok()
         {
             var items = await _db.SelectByIdListAsync<Product, int>(new[] { 36, 37, 38 });
             Assert.NotEmpty(items);
         }
          
         [Fact()]
-        public async void DapperExtensions_SelectAsync_Ok()
+        public async Task DapperExtensions_SelectAsyncWithWhere_Ok()
+        { 
+            var items = await _db.SelectAsync(new SelectProductsWhereArgs
+            {
+                Search = "доска"
+            });
+            Assert.NotEmpty(items);
+        }
+        
+        [Fact()]
+        public async Task DapperExtensions_SelectAsync_Ok()
         {
             var search = new Product
             {
@@ -51,19 +66,19 @@ namespace Dapper.AutoQuery.Lib.Tests
         }
 
         [Fact()]
-        public async void DapperExtensions_DeleteAsync_Ok()
+        public async Task DapperExtensions_DeleteAsync_Ok()
         {
             await _db.DeleteAsync<Product, int>(new[] { 1, 2, 3 });
         }
 
         [Fact()]
-        public async void DapperExtensions_DeleteSingleAsync_Ok()
+        public async Task DapperExtensions_DeleteSingleAsync_Ok()
         {
             await _db.DeleteSingleAsync(new Product { Id = 33 });
         }
 
         [Fact()]
-        public async void DapperExtensions_UpdateAsync_Ok()
+        public async Task DapperExtensions_UpdateAsync_Ok()
         {
             var items = await _db.SelectAsync<Product, int>();
 
@@ -76,7 +91,7 @@ namespace Dapper.AutoQuery.Lib.Tests
         }
 
         [Fact()]
-        public async void DapperExtensions_InsertAsync_Ok()
+        public async Task DapperExtensions_InsertAsync_Ok()
         {
             var product = new Product
             {

@@ -1,6 +1,7 @@
 ﻿using Dapper.AutoQuery.Lib;
 using Humanizer;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace Dapper.AutoQuery.TestModels;
 
@@ -272,4 +273,35 @@ public class UserTokens
 
     public string Value { get; set; }
 
+}
+public class SelectProductsWhereArgs : IWhereClauseArgs<Product>
+{
+    public string? Search { get; set; }
+    public DateTime? DateFilter { get; set; }
+    public string ToWhereClause()
+    {
+        var sb = new StringBuilder();
+
+        if (!string.IsNullOrWhiteSpace(Search))
+        {
+            var searchableProps = IWhereClauseArgs<Product>
+                .Members
+                .Where(x => x.Value.PropertyType == typeof(string))
+                .Select(x => $"{x.Key} LIKE '%' + @{nameof(Search)} + '%'");
+
+            var str = string.Join(" OR ", searchableProps);
+
+            if (str.Length > 0)
+            {
+                sb.Append(str);
+            }
+        }
+
+        if (DateFilter is not null)
+        {
+            sb.Append($"AND {nameof(Product.DateCreated)} >= @{nameof(DateFilter)}");
+        }
+
+        return sb.ToString();
+    }
 }

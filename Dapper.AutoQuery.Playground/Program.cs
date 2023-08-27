@@ -12,7 +12,7 @@ AutoQuery
     .SetColumnAttributeType(typeof(ColumnAttribute))
     .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
     .SetVarPrefix("@")
-    .SetGlobally();
+    .Build();
 
 var a = new WhereArgs()
 {
@@ -26,8 +26,8 @@ var select = AutoQuery.Select<TestModel, WhereArgs>((x, y) =>
         x.FieldWithCustomName.Equals(y.Search) && 
         x.Created >= y.From
     ));
- 
 
+Console.WriteLine(select);
 
 public class WhereArgs
 {

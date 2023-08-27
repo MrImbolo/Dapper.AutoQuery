@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Common;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Dapper.AutoQuery.Lib
 {
-    public interface IWhereClauseArgs
+    public interface IWhereClauseArgs<T>
     {
+        public static Dictionary<string, PropertyInfo> Members { get; } = typeof(T)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .ToDictionary(x => x.Name, x => x);
+
         string ToWhereClause();
     }
     public class AutoQuery
@@ -108,6 +106,7 @@ namespace Dapper.AutoQuery.Lib
                 (
                     {GetManager<T>().Members.AsNoKeyFieldSet} 
                 )
+                OUTPUT INSERTED.{GetManager<T>().Members.KeyField} 
                 VALUES
                 (
                     {GetManager<T>().Members.AsNoKeyArgSet} 
@@ -128,6 +127,22 @@ namespace Dapper.AutoQuery.Lib
                 FROM {GetManager<T>().TableName} 
                 """;
 
+            _logAction?.Invoke(sql);
+
+            return sql;
+        }
+        public static string Select<T>(IWhereClauseArgs<T> args)
+            where T : class
+        {
+            ArgumentNullException.ThrowIfNull(args, nameof(args));
+
+            var sql = $"""
+                SELECT 
+                    {GetManager<T>().Members.AsFullFieldSet}
+                FROM {GetManager<T>().TableName}
+                WHERE 
+                    {args.ToWhereClause()}
+                """;
             _logAction?.Invoke(sql);
 
             return sql;
@@ -240,6 +255,8 @@ namespace Dapper.AutoQuery.Lib
         {
             whereClauseBuilder.Replace(param + ".", replacer);
         }
+
+        
     }
 
     internal enum EContainsType

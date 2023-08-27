@@ -60,6 +60,20 @@ public static class DapperExtensions
 
         return items;
     }
+    
+    public static async Task<IEnumerable<T>> SelectAsync<T>(
+        this IDbConnection db,
+        IWhereClauseArgs<T> args,
+        IDbTransaction? transaction = null)
+        where T : class
+    {
+        var items = await db.QueryAsync<T>(
+            AutoQuery.Select(args),
+            args, 
+            transaction);
+
+        return items;
+    }
 
     public static async Task DeleteAsync<T, TKey>(
         this IDbConnection db,
@@ -106,36 +120,54 @@ public static class DapperExtensions
     {
         var externalTransaction = transaction is not null;
 
-        db.Open();
-        transaction ??= db.BeginTransaction();
-
-        var tempTableName = "##temp_" + Guid.NewGuid().ToString("N")[..8];
-        var tempTableQuery = AutoQuery.CreateIdTempTable(tempTableName, "INT");
-
-        await db.ExecuteAsync(tempTableQuery, transaction: transaction);
-
-        foreach (var chunk in items.Chunk(500))
+        if (items.Length >= 100)
         {
-            await db.ExecuteAsync(
-                AutoQuery.InsertBatch<T>(tempTableName),
-                chunk, 
-                transaction);
-        }
+            db.Open();
+            transaction ??= db.BeginTransaction();
 
-        tempTableQuery = AutoQuery.GetIdsAndDropIdTempTable(tempTableName);
+            var tempTableName = "##temp_" + Guid.NewGuid().ToString("N")[..8];
+            var tempTableQuery = AutoQuery.CreateIdTempTable(tempTableName, "INT");
+
+            await db.ExecuteAsync(tempTableQuery, transaction: transaction);
+
+            foreach (var chunk in items.Chunk(500))
+            {
+                await db.ExecuteAsync(
+                    AutoQuery.InsertBatch<T>(tempTableName),
+                    chunk, 
+                    transaction);
+            }
+
+            tempTableQuery = AutoQuery.GetIdsAndDropIdTempTable(tempTableName);
         
-        var ids = await db.QueryAsync<TKey>(
-            tempTableQuery, 
-            transaction: transaction);
+            var ids = await db.QueryAsync<TKey>(
+                tempTableQuery, 
+                transaction: transaction);
 
-        foreach (var (item, id) in items.Zip(ids))
-        {
-            assignId(item, id);
+            foreach (var (item, id) in items.Zip(ids))
+            {
+                assignId(item, id);
+            }
+
+            if (!externalTransaction)
+            {
+                transaction.Commit();
+            }
+            return;
         }
-
-        if (!externalTransaction)
+        else
         {
-            transaction.Commit();
+            foreach (var item in items)
+            {
+
+                var id = await db.QueryFirstOrDefaultAsync<TKey>(
+                    AutoQuery.Insert<T>(),
+                    item,
+                    transaction: transaction
+                );
+
+                assignId(item, id);
+            }
         }
     }
 

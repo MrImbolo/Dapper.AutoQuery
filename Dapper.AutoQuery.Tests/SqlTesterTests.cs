@@ -22,7 +22,7 @@ namespace Dapper.AutoQuery.Lib.Tests
                 .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
                 .SetVarPrefix("@")
                 .SetUpLogAction(Console.WriteLine)
-                .SetGlobally();
+                .Build();
         }
                  
 
