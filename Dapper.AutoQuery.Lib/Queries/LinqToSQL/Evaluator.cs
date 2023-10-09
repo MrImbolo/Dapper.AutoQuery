@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Dapper.AutoQuery.Lib
+namespace Dapper.AutoQuery.Lib.Queries.LinqToSQL
 {
     public static class Evaluator
     {
@@ -37,7 +37,7 @@ namespace Dapper.AutoQuery.Lib
         public static Expression PartialEval(Expression expression)
         {
 
-            return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
+            return PartialEval(expression, CanBeEvaluatedLocally);
 
         }
 

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.AutoQuery.TestModels
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.AutoQuery.Playground", "Dapper.AutoQuery.Playground\Dapper.AutoQuery.Playground.csproj", "{9E4A02D0-A711-455C-94E2-FF7F25E65B1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.AutoQuery.ExtensionsBenchmark", "Dapper.AutoQuery.ExtensionsBenchmark\Dapper.AutoQuery.ExtensionsBenchmark.csproj", "{82CA6435-BBC9-4D3D-A7D6-2B309D27E9BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper.AutoQuery.ExtensionsBenchmark", "Dapper.AutoQuery.ExtensionsBenchmark\Dapper.AutoQuery.ExtensionsBenchmark.csproj", "{82CA6435-BBC9-4D3D-A7D6-2B309D27E9BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.AutoQuery.SqlServer", "Dapper.AutoQuery.SqlServer\Dapper.AutoQuery.SqlServer.csproj", "{18E3A91F-DC26-44D4-B7E6-7E9F92E7A5E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{82CA6435-BBC9-4D3D-A7D6-2B309D27E9BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82CA6435-BBC9-4D3D-A7D6-2B309D27E9BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82CA6435-BBC9-4D3D-A7D6-2B309D27E9BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18E3A91F-DC26-44D4-B7E6-7E9F92E7A5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18E3A91F-DC26-44D4-B7E6-7E9F92E7A5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18E3A91F-DC26-44D4-B7E6-7E9F92E7A5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18E3A91F-DC26-44D4-B7E6-7E9F92E7A5E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Text;
+using Dapper.AutoQuery.Lib.Core;
+using Dapper.AutoQuery.Lib.Queries.LinqToSQL;
 
 namespace Dapper.AutoQuery.Lib
 {
@@ -189,19 +191,19 @@ namespace Dapper.AutoQuery.Lib
             switch (b.NodeType)
             {
                 case ExpressionType.And:
-                    _sb.Append(DAQDefaults.Configuration.FieldLayoutPolicy.Prefix + " AND ");
+                    _sb.Append(AutoQueryGenerator.Configuration.SQLDependentConfig.FieldLayoutPolicy.Prefix + " AND ");
                     break;
 
                 case ExpressionType.AndAlso:
-                    _sb.Append(DAQDefaults.Configuration.FieldLayoutPolicy.Prefix + " AND ");
+                    _sb.Append(AutoQueryGenerator.Configuration.SQLDependentConfig.FieldLayoutPolicy.Prefix + " AND ");
                     break;
 
                 case ExpressionType.Or:
-                    _sb.Append(DAQDefaults.Configuration.FieldLayoutPolicy.Prefix + " OR ");
+                    _sb.Append(AutoQueryGenerator.Configuration.SQLDependentConfig.FieldLayoutPolicy.Prefix + " OR ");
                     break;
 
                 case ExpressionType.OrElse:
-                    _sb.Append(DAQDefaults.Configuration.FieldLayoutPolicy.Prefix + " OR ");
+                    _sb.Append(AutoQueryGenerator.Configuration.SQLDependentConfig.FieldLayoutPolicy.Prefix + " OR ");
                     break;
 
                 case ExpressionType.Equal:
@@ -303,7 +305,7 @@ namespace Dapper.AutoQuery.Lib
                     return m;
                 }
 
-                _sb.Append(DAQDefaults.Configuration.VarPrefix + m.Member.Name);
+                _sb.Append(AutoQueryGenerator.Configuration.SQLDependentConfig.VarPrefix + m.Member.Name);
                 return m;
             }
 

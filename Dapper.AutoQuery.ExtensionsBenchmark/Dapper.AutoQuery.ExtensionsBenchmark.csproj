@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dapper.AutoQuery.Lib\Dapper.AutoQuery.Lib.csproj" />
+    <ProjectReference Include="..\Dapper.AutoQuery.SqlServer\Dapper.AutoQuery.SqlServer.csproj" />
     <ProjectReference Include="..\Dapper.AutoQuery.TestModels\Dapper.AutoQuery.TestModels.csproj" />
   </ItemGroup>
 

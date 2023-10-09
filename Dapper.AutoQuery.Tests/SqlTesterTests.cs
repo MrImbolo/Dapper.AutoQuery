@@ -1,6 +1,5 @@
-﻿using Dapper.AutoQuery.TestModels;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Dapper.AutoQuery.Lib.Core;
+using Dapper.AutoQuery.TestModels;
 using Xunit.Abstractions;
 
 namespace Dapper.AutoQuery.Lib.Tests
@@ -13,14 +12,9 @@ namespace Dapper.AutoQuery.Lib.Tests
         public SqlTesterTests(ITestOutputHelper testOutput)
         {
             _testOutput = testOutput;
-            DAQDefaults
+            AutoQueryGenerator
                 .CreateBuilder()
-                .SetNotMappedAttributeType(typeof(NotMappedAttribute))
-                .SetKeyAttributeType(typeof(KeyAttribute))
-                .SetTableAttributeType(typeof(TableAttribute))
-                .SetColumnAttributeType(typeof(ColumnAttribute))
-                .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
-                .SetVarPrefix("@")
+                .SetUpSQLServer()
                 .SetUpLogAction(Console.WriteLine)
                 .Build();
         }
@@ -30,24 +24,24 @@ namespace Dapper.AutoQuery.Lib.Tests
         public void DeleteByIdListTest()
         {
             var sql = """
-                DELETE FROM TestModels 
+                DELETE FROM [TestModels] 
                 WHERE 
-                    Id IN @Ids 
+                    [Id] IN @Ids 
                 """;
 
-            Assert.Equal(sql, AutoQuery.DeleteByIdList<TestModel>());
+            Assert.Equal(sql, AutoQueryGenerator.DeleteByIdList<TestModel>());
         }
 
         [Fact()]
         public void DeleteSingleTest()
         {
             var sql = """
-                DELETE FROM TestModels 
+                DELETE FROM [TestModels] 
                 WHERE 
-                    Id = @Id 
+                    [Id] = @Id 
                 """;
 
-            Assert.Equal(sql, AutoQuery.DeleteSingle<TestModel>());
+            Assert.Equal(sql, AutoQueryGenerator.DeleteSingle<TestModel>());
         }
 
         [Fact()]
@@ -58,19 +52,20 @@ namespace Dapper.AutoQuery.Lib.Tests
                 CREATE TABLE {tempTableName}(Id INT)
                 """;
 
-            Assert.Equal(sql, AutoQuery.CreateIdTempTable(tempTableName, "INT"));
+            Assert.Equal(sql, AutoQueryGenerator.CreateIdTempTable(tempTableName, "INT"));
         }
 
         [Fact()]
         public void InsertTest()
         {
             var sql = $"""
-                INSERT INTO TestModels 
+                INSERT INTO [TestModels] 
                 (
-                    Name
-                    ,Created
-                    ,CustomName 
+                    [Name]
+                    ,[Created]
+                    ,[CustomName] 
                 )
+                OUTPUT INSERTED.[Id] 
                 VALUES
                 (
                     @Name
@@ -78,7 +73,7 @@ namespace Dapper.AutoQuery.Lib.Tests
                     ,@FieldWithCustomName 
                 )
                 """;
-            Assert.Equal(sql, AutoQuery.Insert<TestModel>());
+            Assert.Equal(sql, AutoQueryGenerator.Insert<TestModel>());
         }
 
         [Fact()]
@@ -86,14 +81,14 @@ namespace Dapper.AutoQuery.Lib.Tests
         {
             var sql = """
                 SELECT 
-                    Id
-                    ,Name
-                    ,Created
-                    ,CustomName 
-                FROM TestModels 
+                    [Id]
+                    ,[Name]
+                    ,[Created]
+                    ,[CustomName] 
+                FROM [TestModels] 
                 """;
 
-            Assert.Equal(sql, AutoQuery.Select<TestModel>());
+            Assert.Equal(sql, AutoQueryGenerator.Select<TestModel>());
         }
 
         [Fact()]
@@ -101,32 +96,32 @@ namespace Dapper.AutoQuery.Lib.Tests
         {
             var sql = """
                 SELECT 
-                    Id
-                    ,Name
-                    ,Created
-                    ,CustomName 
-                FROM TestModels 
+                    [Id]
+                    ,[Name]
+                    ,[Created]
+                    ,[CustomName] 
+                FROM [TestModels] 
                 WHERE 
-                    Id = @Id
+                    [Id] = @Id
                 """;
 
-            Assert.Equal(sql, AutoQuery.SelectOneById<TestModel, int>());
+            Assert.Equal(sql, AutoQueryGenerator.SelectOneById<TestModel, int>());
         }
 
         [Fact()]
         public void UpdateTest()
         {
             var sql = """
-                UPDATE TestModels 
+                UPDATE [TestModels] 
                 SET
-                    Name = @Name
-                    ,Created = @Created
-                    ,CustomName = @FieldWithCustomName 
+                    [Name] = @Name
+                    ,[Created] = @Created
+                    ,[CustomName] = @FieldWithCustomName 
                 WHERE
-                    Id = @Id 
+                    [Id] = @Id 
                 """;
 
-            Assert.Equal(sql, AutoQuery.Update<TestModel>());
+            Assert.Equal(sql, AutoQueryGenerator.Update<TestModel>());
         }
 
         [Fact()]
@@ -134,16 +129,16 @@ namespace Dapper.AutoQuery.Lib.Tests
         {
             var sql = """
                 SELECT 
-                    Id
-                    ,Name
-                    ,Created
-                    ,CustomName 
-                FROM TestModels 
+                    [Id]
+                    ,[Name]
+                    ,[Created]
+                    ,[CustomName] 
+                FROM [TestModels] 
                 WHERE 
-                    Id IN @Ids
+                    [Id] IN @Ids
                 """;
 
-            Assert.Equal(sql, AutoQuery.SelectByIdList<TestModel, int>());
+            Assert.Equal(sql, AutoQueryGenerator.SelectByIdList<TestModel, int>());
         }
     }
 }

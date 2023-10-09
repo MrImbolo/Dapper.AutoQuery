@@ -1,13 +1,14 @@
 ﻿using System.Linq.Expressions;
 using System.Security;
 
-namespace Dapper.AutoQuery.Lib.Misc
+namespace Dapper.AutoQuery.Lib.Extensions
 {
     public static class StringExtensionsHelper<T>
     {
         internal static Dictionary<string, Func<T, string>> ToStringExpressionCache { get; } = new();
         internal static Dictionary<string, Func<string, T>> FromStringExpressionCache { get; } = new();
     }
+
     public static class StringExtensions
     {
         public static string Stringify<T>(this IEnumerable<T> items, string separator, Expression<Func<T, string>>? toString = null)
@@ -21,7 +22,7 @@ namespace Dapper.AutoQuery.Lib.Misc
             }
 
             string expKey = toString.ToString();
-            
+
             if (!StringExtensionsHelper<T>.ToStringExpressionCache.TryGetValue(expKey, out var exp))
             {
                 exp = toString.Compile();

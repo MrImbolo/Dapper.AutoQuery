@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Dapper.AutoQuery.Lib
+namespace Dapper.AutoQuery.Lib.SqlDependent
 {
     public readonly struct FieldLayoutPolicy
     {
@@ -32,7 +32,7 @@ namespace Dapper.AutoQuery.Lib
         public static FieldLayoutPolicy StartCommaMultilineOneTab => new(",", Environment.NewLine + "    ");
 
 
-        public static bool operator ==(FieldLayoutPolicy policy1, FieldLayoutPolicy policy2) 
+        public static bool operator ==(FieldLayoutPolicy policy1, FieldLayoutPolicy policy2)
             => policy1.Separator == policy2.Separator && policy1.Prefix == policy2.Prefix && policy1.Postfix == policy2.Postfix;
         public static bool operator !=(FieldLayoutPolicy policy1, FieldLayoutPolicy policy2)
             => policy1.Separator != policy2.Separator || policy1.Prefix != policy2.Prefix || policy1.Postfix != policy2.Postfix;

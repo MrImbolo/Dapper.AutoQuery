@@ -1,4 +1,4 @@
-﻿using Dapper.AutoQuery.Lib;
+﻿using Dapper.AutoQuery.Lib.Queries;
 using Humanizer;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;

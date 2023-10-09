@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Dapper.AutoQuery.Lib;
+using Dapper.AutoQuery.Lib.Extensions;
 using Dapper.AutoQuery.TestModels;
 using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
@@ -20,14 +20,9 @@ namespace Dapper.AutoQuery.ExtensionsBenchmark
             var connString = "Data Source=ZTECBOOK\\SQLEXPRESS;Initial Catalog=TheWood.Dev;Integrated Security=True;Connect Timeout=60;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             _db = new SqlConnection(connString);
 
-            DAQDefaults
+            Lib.Core.AutoQueryGenerator
                 .CreateBuilder()
-                .SetNotMappedAttributeType(typeof(NotMappedAttribute))
-                .SetKeyAttributeType(typeof(KeyAttribute))
-                .SetTableAttributeType(typeof(TableAttribute))
-                .SetColumnAttributeType(typeof(ColumnAttribute))
-                .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
-                .SetVarPrefix("@")
+                .SetUpSQLServer()
                 .Build();
 
             _productToDelete = new Product { Id = 33 };

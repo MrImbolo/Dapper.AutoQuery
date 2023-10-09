@@ -1,17 +1,10 @@
-﻿using Dapper.AutoQuery.Lib;
+﻿using Dapper.AutoQuery;
+using Dapper.AutoQuery.Lib.Core;
 using Dapper.AutoQuery.TestModels;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
-AutoQuery.SetUpCustomColumnAttributeSupport();
-AutoQuery
+AutoQueryGenerator
     .CreateBuilder()
-    .SetNotMappedAttributeType(typeof(NotMappedAttribute))
-    .SetKeyAttributeType(typeof(KeyAttribute))
-    .SetTableAttributeType(typeof(TableAttribute))
-    .SetColumnAttributeType(typeof(ColumnAttribute))
-    .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
-    .SetVarPrefix("@")
+    .SetUpSQLServer() 
     .Build();
 
 var a = new WhereArgs()
@@ -20,7 +13,7 @@ var a = new WhereArgs()
     Search = "abc"
 };
 
-var select = AutoQuery.Select<TestModel, WhereArgs>((x, y) => 
+var select = AutoQueryGenerator.Select<TestModel, WhereArgs>((x, y) => 
     x.Id == y.Id || 
     (  
         x.FieldWithCustomName.Equals(y.Search) && 

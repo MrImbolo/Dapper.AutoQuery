@@ -1,4 +1,6 @@
-﻿using Dapper.AutoQuery.TestModels;
+﻿using Dapper.AutoQuery.Lib.Core;
+using Dapper.AutoQuery.Lib.Extensions;
+using Dapper.AutoQuery.TestModels;
 using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace Dapper.AutoQuery.Lib.Tests
 {
-    
+
     public class DapperExtensionsTests
     {
         private SqlConnection _db;
@@ -17,14 +19,9 @@ namespace Dapper.AutoQuery.Lib.Tests
         {
             var connString = "Data Source=ZTECBOOK\\SQLEXPRESS;Initial Catalog=TheWood.Dev;Integrated Security=True;Connect Timeout=60;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
             _db = new SqlConnection(connString);
-            DAQDefaults
+            AutoQueryGenerator
                 .CreateBuilder()
-                .SetNotMappedAttributeType(typeof(NotMappedAttribute))
-                .SetKeyAttributeType(typeof(KeyAttribute))
-                .SetTableAttributeType(typeof(TableAttribute))
-                .SetColumnAttributeType(typeof(ColumnAttribute))
-                .SetLayoutPolicy(FieldLayoutPolicy.StartCommaMultilineOneTab)
-                .SetVarPrefix("@")
+                .SetUpSQLServer()
                 .SetUpLogAction(testOutput.WriteLine)
                 .Build();
 

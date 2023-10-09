@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dapper.AutoQuery.Lib
+namespace Dapper.AutoQuery.Lib.Queries.LinqToSQL
 {
 
     public struct SqlOperation
