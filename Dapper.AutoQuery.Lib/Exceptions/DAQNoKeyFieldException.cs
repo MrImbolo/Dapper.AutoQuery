@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Dapper.AutoQuery.Lib.Exceptions
 {
+    public class DAQQueryException : Exception
+    {
+        public DAQQueryException(string message) : base(message) { }
+        public DAQQueryException()
+        {
+        }
+    }
     public class DAQNoKeyFieldException : Exception
     {
         public DAQNoKeyFieldException() : base("Entity has no key configured")

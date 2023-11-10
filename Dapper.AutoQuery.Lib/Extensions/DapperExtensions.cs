@@ -1,9 +1,8 @@
-﻿using System.Data;
+﻿using Dapper.AutoQuery.Lib.Core;
+using Dapper.AutoQuery.Lib.Queries;
+using System.Data;
 using System.Linq.Expressions;
 using System.Numerics;
-using Dapper.AutoQuery.Lib.Core;
-using Dapper.AutoQuery.Lib.Queries;
-
 namespace Dapper.AutoQuery.Lib.Extensions;
 
 public static class DapperExtensions
@@ -131,6 +130,9 @@ public static class DapperExtensions
             transaction ??= db.BeginTransaction();
 
             var tempTableName = "##temp_" + Guid.NewGuid().ToString("N")[..8];
+             
+            // TODO: get sql db type for c# type. 
+
             var tempTableQuery = AutoQueryGenerator.CreateIdTempTable(tempTableName, "INT");
 
             await db.ExecuteAsync(tempTableQuery, transaction: transaction);

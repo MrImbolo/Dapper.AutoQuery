@@ -160,6 +160,23 @@ namespace Dapper.AutoQuery.Lib.Core
 
             return sql;
         }
+        
+        public static string UpdateBatch<T>(string tempTableName)
+            where T : class
+        {
+            EntityManager<T> entityManager = GetManager<T>();
+            var sql = Configuration.QueryLibrary.UpdateBatch(
+                entityManager.TableName,
+                tempTableName,
+                entityManager.Members.AsNoKeyFieldAssignmentsSet,
+                entityManager.Members.KeyField,
+                entityManager.Members.KeyArg
+            );
+
+            _logAction?.Invoke(sql);
+
+            return sql;
+        }
 
         public static string SelectByIdList<T, TId>()
             where T : class
